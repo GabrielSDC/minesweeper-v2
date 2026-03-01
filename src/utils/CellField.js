@@ -1,37 +1,32 @@
-function getAllCells(height, width) {
-    let cells = [];
-    for(let i = 0; i < height; i++)
-        for(let j = 0; j < width; j++)
-            cells[i * width + j] = new Cell(j, i);
-    return cells;
-}
+import Cell from './Cell.js';
 
 class CellField {
-    constructor(info) {
-        this.width = info.width;
-        this.height = info.height;
-        this.totalMines = info.totalMines;
+    constructor({w, h, b}) {
+        this.width = w;
+        this.height = h;
+        this.totalMines = b;
         this.state = "none";
 
-        this.emptyCells = info.height * info.width - info.totalMines;
-        this.cells = getAllCells(info.height, info.width);
+        this.emptyCells = h * w - b;
+        this.cells = Array.from({ length: w * h }, (_, i) => new Cell(i % w, i / w));
+        console.log(this.cells);    
         this.mines = [];
 
         // connect all cells to their neighboors
-        for(let i = 0; i < info.height; i++) {
-            for(let j = 0; j < info.width; j++) {
-                let currentCell = this.cells[i * info.width + j];
-                currentCell.addEdges(this, j, i, info.width, info.height);
+        for(let i = 0; i < h; i++) {
+            for(let j = 0; j < w; j++) {
+                let currentCell = this.cells[i * w + j];
+                currentCell.addEdges(this, j, i, w, h);
             }
         }
 
         // place the mines into the field
-        for(let i = 0; i < info.totalMines; i++) {
+        for(let i = 0; i < b; i++) {
             let cell;
             do {
-                const x = parseInt(Math.random() * info.width);
-                const y = parseInt(Math.random() * info.height);
-                cell = this.cells[y * info.width + x];
+                const x = parseInt(Math.random() * w);
+                const y = parseInt(Math.random() * h);
+                cell = this.cells[y * w + x];
             }
             while(cell.isMined);
             
@@ -52,3 +47,5 @@ class CellField {
         return this.cells[i * this.width + j];
     }
 }
+
+export default CellField;

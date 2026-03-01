@@ -1,9 +1,11 @@
-function Field({h, w}) {
+import CellField from '../utils/CellField.js';
+
+function Field({h, w, b}) {
+    const field = new CellField({h, w, b});
+    
     return ( 
         <>
-            <Cell id={1}/>
-            <Cell id={2}/>
-            <Cell id={3}/>
+        { field.cells.map((_, i) => <Cell id={i}/>) }
         </>
      );
 }
