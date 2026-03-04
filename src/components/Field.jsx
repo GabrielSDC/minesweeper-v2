@@ -23,10 +23,29 @@ function Field({h, w, b}) {
 }
 
 function Cell({cell}) {
-    const [thiscell, setthiscell] = useState(cell);
-    if (thiscell.isMined)
-        return <div className='w-10 h-10 bg-(--green) hover:bg-black' onClick={() => console.log(thiscell)}></div>;
-    return <div className='w-10 h-10 bg-(--green) hover:bg-white' onClick={() => console.log(thiscell)}></div>;
+    const [isMined, setIsMined] = useState(cell.isMined);
+    const [isCaved, setIsCaved] = useState(false);
+    const [isFlagged, setIsFlagged] = useState(false);
+
+    function revealCell() {
+        if (isMined) {
+            alert('perdeu');
+            return;
+        }
+        if (!isFlagged)
+            setIsCaved(!isCaved);
+    }
+    
+    function flagCell(e) {
+        e.preventDefault();
+        setIsFlagged(!isFlagged);
+    }
+
+    if (!isCaved)
+        return <div onClick={revealCell} onContextMenu={flagCell} className='w-10 h-10 bg-(--green) border border-(--green-border)'>
+            {isFlagged && <span className='flex mx-auto text-2xl'>🚩</span>}
+        </div>;
+    return <div className='w-10 h-10 bg-(--brown) border border-(--brown-border)'></div>;
 }
 
 export default Field;
