@@ -8,8 +8,7 @@ class CellField {
         this.state = "none";
 
         this.emptyCells = h * w - b;
-        this.cells = Array.from({ length: w * h }, (_, i) => new Cell(i % w, i / w));
-        console.log(this.cells);    
+        this.cells = Array.from({ length: w * h }, (_, i) => new Cell(i % w, Math.floor(i / w)));  
         this.mines = [];
 
         // connect all cells to their neighboors
@@ -33,6 +32,8 @@ class CellField {
             cell.placeMine();
             this.mines.push(cell);
         }
+
+        console.log(this.getCell(0, 2));
     }
 
     isCellMined(i, j) {
