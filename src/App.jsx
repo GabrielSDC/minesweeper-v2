@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import Field from './components/Field'
+import CellField from './utils/CellField.js';
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const dimensions = {w: 10, h: 10, b: 10};
+  const [field, setField] = useState(new CellField(dimensions));
+  
   return (
-    <Field h='10' w='10' b='10'/>
+    <Field field={field} {...dimensions}/>
   )
 }
 

@@ -1,11 +1,10 @@
 import Cell from './Cell.js';
 
-class CellField {
+export default class CellField {
     constructor({w, h, b}) {
         this.width = w;
         this.height = h;
         this.totalMines = b;
-        this.state = "none";
 
         this.emptyCells = h * w - b;
         this.cells = Array.from({ length: w * h }, (_, i) => new Cell(i % w, Math.floor(i / w)));  
@@ -32,8 +31,6 @@ class CellField {
             cell.placeMine();
             this.mines.push(cell);
         }
-
-        console.log(this.getCell(0, 2));
     }
 
     isCellMined(i, j) {
@@ -48,5 +45,3 @@ class CellField {
         return this.cells[i * this.width + j];
     }
 }
-
-export default CellField;

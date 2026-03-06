@@ -1,10 +1,11 @@
-class Cell {
+export default class Cell {
     constructor(x, y) {
         this.x = x;
         this.y = y;
         this.minesAround = 0;
         this.isMined = false;
-        this.state = "none";
+        this.isFlagged = false;
+        this.isCaved = false;
         this.edges = [];
     }
     
@@ -27,5 +28,3 @@ class Cell {
         }
     }
 }
-
-export default Cell;

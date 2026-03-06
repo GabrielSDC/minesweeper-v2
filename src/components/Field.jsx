@@ -1,17 +1,38 @@
-import { useState } from 'react';
-import CellField from '../utils/CellField.js';
+import { useState, memo, useCallback } from 'react';
 
-function Field({h, w, b}) {
-    const field = new CellField({h, w, b});
-    
+function Field({field, w, h}) {
+    const [cells, setCells] = useState(field.cells);
+
+    const revealCell = useCallback((i) => {
+        setCells(prev => {
+            const next = [...prev];
+            if (!next[i].isFlagged)
+                next[i] = { ...next[i], isCaved: true };
+            return next;
+        });
+    }, []);
+
+    const flagCell = useCallback((i, e) => {
+        e.preventDefault();
+        setCells(prev => {
+            const next = [...prev];
+            next[i] = { ...next[i], isFlagged: !next[i].isFlagged };
+            return next;
+        });
+    }, []);
+
     return (
         <table>
             <tbody>
             {Array.from({ length: h }, (_, row) => (
-                <tr key={row}>
+                <tr key={'row'+row}>
                 {Array.from({ length: w }, (_, col) => (
-                    <td key={col}>
-                        <Cell cell={field.getCell(col, row)}/>
+                    <td key={'cols'+col}>
+                        <Cell key={row * w + col}
+                            index={row * w + col} 
+                            {...cells[row * w + col]} 
+                            revealCell={revealCell} 
+                            flagCell={flagCell}/>
                     </td>
                     )
                 )}
@@ -22,30 +43,12 @@ function Field({h, w, b}) {
     );
 }
 
-function Cell({cell}) {
-    const [isMined, setIsMined] = useState(cell.isMined);
-    const [isCaved, setIsCaved] = useState(false);
-    const [isFlagged, setIsFlagged] = useState(false);
-
-    function revealCell() {
-        if (isMined) {
-            alert('perdeu');
-            return;
-        }
-        if (!isFlagged)
-            setIsCaved(!isCaved);
-    }
-    
-    function flagCell(e) {
-        e.preventDefault();
-        setIsFlagged(!isFlagged);
-    }
-
+const Cell = memo(function Cell({isCaved, isFlagged, revealCell, flagCell, index}) {
     if (!isCaved)
-        return <div onClick={revealCell} onContextMenu={flagCell} className='w-10 h-10 bg-(--green) border border-(--green-border)'>
+        return <div onClick={() => revealCell(index)} onContextMenu={(e) => flagCell(index, e)} className='w-10 h-10 bg-(--green) border border-(--green-border)'>
             {isFlagged && <span className='flex mx-auto text-2xl'>🚩</span>}
         </div>;
     return <div className='w-10 h-10 bg-(--brown) border border-(--brown-border)'></div>;
-}
+});
 
 export default Field;
