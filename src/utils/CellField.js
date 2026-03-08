@@ -33,12 +33,6 @@ export default class CellField {
         }
     }
 
-    isCellMined(i, j) {
-        if(i < 0 || i >= this.height || j < 0 || j >= this.width)
-            return false;
-        return this.cells[i * this.width + j].isMined || false;
-    }
-
     getCell(i, j) {
         if(i < 0 || i >= this.height || j < 0 || j >= this.width)
             return undefined;

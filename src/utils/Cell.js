@@ -6,7 +6,7 @@ export default class Cell {
         this.isMined = false;
         this.isFlagged = false;
         this.isCaved = false;
-        this.edges = [];
+        this.neighbors = [];
     }
     
     addEdges(field, x, y, w, h) {
@@ -14,8 +14,7 @@ export default class Cell {
             for(let j = x - 1; j <= x + 1; j++) {
                 if(i === y && j === x) 
                     continue;
-                const newEdge = field.getCell(i, j);
-                if(newEdge) this.edges.push(newEdge);
+                field.getCell(i, j) && this.neighbors.push(field.getCell(i, j));
             }
         }
     }
@@ -23,8 +22,8 @@ export default class Cell {
     placeMine() {
         this.isMined = true;
         this.minesAround = 9;
-        for(let edge of this.edges) {
-            edge.minesAround++;
+        for(let neighbor of this.neighbors)  {
+            neighbor.minesAround++;
         }
     }
 }

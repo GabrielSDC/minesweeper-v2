@@ -10,8 +10,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --green: rgb(57, 151, 57);
-  --green-border: rgb(47, 146, 47);
-  --brown: rgb(170, 110, 19);
-  --brown-border: rgb(122, 78, 11);
+  --green: #414833;
+  --green-border: #656d4a;
+  --brown: #7f5539;
+  --brown-border  : #a68a64;
+  --number: #ede0d4;
 }
