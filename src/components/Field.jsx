@@ -1,49 +1,28 @@
-import { useState, memo, useCallback } from 'react';
+import { useReducer, useCallback } from 'react';
+import Cell from './Cell.jsx'
 
 function Field({field, w, h}) {
-    const [cells, setCells] = useState(field.cells);
-
-    function floodFillIndexes(cells, i, indexes = []) {
-        if (indexes.includes(i) || cells[i].isFlagged || cells[i].isCaved) {
-            return indexes;
-        }
-        
-        indexes.push(i);
-
-        if (cells[i].minesAround != 0) {
-            return indexes;
-        }
-
-        for (const cell of cells[i].neighbors) {
-            const index = cell.y * w + cell.x;
-            floodFillIndexes(cells, index, indexes);
-        }
-
-        return indexes;
-    }
+    const [cells, dispatch] = useReducer(cellsReducer, field.cells);
 
     const revealCell = useCallback((i) => {
-        setCells(prev => {
-            if (prev[i].isFlagged || prev[i].isCaved)
-                return prev;
-
-            const next = [...prev];
-            
-            for (let index of floodFillIndexes(prev, i)) {
-                next[index] = { ...next[index], isCaved: true };
-            }
-            
-            return next;
+        dispatch({
+            type: 'reveal',
+            index: i,
+            w: w
         });
     }, []);
+    
+    const gameOver = useCallback(() => {
+        dispatch({
+            type: 'gameOver'
+        });
+    }, [])
 
     const flagCell = useCallback((i, e) => {
-        e.preventDefault();
-        setCells(prev => {
-            const next = [...prev];
-            if (!next[i].isCaved)
-                next[i] = { ...next[i], isFlagged: !next[i].isFlagged };
-            return next;
+        dispatch({
+            type: 'flag',
+            index: i, 
+            e: e
         });
     }, []);
 
@@ -58,6 +37,7 @@ function Field({field, w, h}) {
                             index={row * w + col} 
                             {...cells[row * w + col]} 
                             revealCell={revealCell} 
+                            gameOver={gameOver} 
                             flagCell={flagCell}/>
                     </td>
                     )
@@ -69,16 +49,59 @@ function Field({field, w, h}) {
     );
 }
 
-const Cell = memo(function Cell({minesAround, isCaved, isFlagged, revealCell, flagCell, index}) {
-    if (!isCaved)
-        return <div onClick={() => revealCell(index)} onContextMenu={(e) => flagCell(index, e)} className='w-10 h-10 bg-(--green)'>
-            <span className='flex mx-auto text-2xl'>
-                {isFlagged && '🚩'}
-            </span>
-        </div>;
-    return <div onContextMenu={(e) => flagCell(index, e)} className='w-10 h-10 bg-(--brown) content-center'>
-        <p className='text-center my-auto font-bold text-xl text-(--number)'>{minesAround || ''}</p>
-    </div>;
-});
+function cellsReducer(cells, action) {
+    switch (action.type) {
+        case 'reveal': {
+            const i = action.index;
+
+            if (cells[i].isFlagged || cells[i].isCaved)
+                return cells;
+
+            const next = [...cells];
+            
+            for (let index of floodFillIndexes(cells, i, action.w)) {
+                next[index] = { ...next[index], isCaved: true };
+            }
+            
+            return next;
+        }
+        case 'gameOver': {
+            const next = [...cells];
+            
+            return next.map((cell) => cell.isMined ? {...cell, isCaved: true} : cell);
+        }
+        case 'flag': {
+            action.e.preventDefault();
+
+            const i = action.index;
+            const next = [...cells];
+
+            if (!next[i].isCaved) {
+                next[i] = { ...next[i], isFlagged: !next[i].isFlagged };
+            }
+            
+            return next;
+        }
+    }
+}
+
+function floodFillIndexes(cells, i, w, indexes = []) {
+    if (indexes.includes(i) || cells[i].isFlagged || cells[i].isCaved) {
+        return indexes;
+    }
+    
+    indexes.push(i);
+
+    if (cells[i].minesAround != 0) {
+        return indexes;
+    }
+
+    for (const cell of cells[i].neighbors) {
+        const index = cell.y * w + cell.x;
+        floodFillIndexes(cells, index, w, indexes);
+    }
+
+    return indexes;
+}
 
 export default Field;
