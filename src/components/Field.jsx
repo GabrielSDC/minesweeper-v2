@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import Cell from './Cell.jsx'
 
-function Field({field, w, h}) {
+function Field({field, w, h, b, restartGame}) {
     const [cells, setCells] = useState(field.cells);
+    const [bombs, setBombs] = useState(b);
+    const [gameState, setGameState] = useState('playing')
 
     function floodFillIndexes(cells, i, indexes = []) {
         if (indexes.includes(i) || cells[i].isFlagged || cells[i].isCaved) {
@@ -24,7 +26,7 @@ function Field({field, w, h}) {
     }
 
     function revealCell(i) {
-        if (cells[i].isFlagged || cells[i].isCaved) {
+        if (gameState === 'stopped' || cells[i].isFlagged || cells[i].isCaved) {
             return;
         }
 
@@ -32,6 +34,7 @@ function Field({field, w, h}) {
         
         if (cells[i].isMined) {
             setCells(next.map((cell) => cell.isMined ? {...cell, isCaved: true} : cell));
+            setGameState('stopped');
             return;
         }
         
@@ -44,13 +47,15 @@ function Field({field, w, h}) {
 
     function flagCell(i, e) {
         e.preventDefault();
-
-        const next = [...cells];
-
-        if (!next[i].isCaved) {
-            next[i] = { ...next[i], isFlagged: !next[i].isFlagged };
+        
+        if (gameState === 'stopped' || cells[i].isCaved) {
+            return;
         }
+        
+        const next = [...cells];
+        next[i] = { ...next[i], isFlagged: !next[i].isFlagged };
 
+        setBombs(bombs + (next[i].isFlagged ? -1 : 1));
         setCells(next);
     }
     
@@ -59,7 +64,7 @@ function Field({field, w, h}) {
             .map((cell) => cells[cell.y * w + cell.x].isFlagged)
             .reduce((acc, curr) => acc + curr, 0);
 
-        if (cells[i].minesAround === 0 || cells[i].minesAround !== flagsAround) {
+        if (gameState === 'stopped' || cells[i].minesAround === 0 || cells[i].minesAround !== flagsAround) {
             return;
         }
         
@@ -68,10 +73,10 @@ function Field({field, w, h}) {
         for (const cell of cells[i].neighbors) {
             const j = cell.y * w + cell.x;
             
-            
             for (let index of floodFillIndexes(cells, j)) {
                 if (next[index].isMined) {
                     setCells(next.map((cell) => cell.isMined ? {...cell, isCaved: true} : cell));
+                    setGameState('stopped');
                     return;
                 }
 
@@ -82,7 +87,19 @@ function Field({field, w, h}) {
         setCells(next);
     }
 
+    function refreshGame() {
+        restartGame();
+        setCells(field.cells);
+        setBombs(b);
+        setGameState('playing')
+    }
+
     return (
+        <>
+        <div className='flex w-full justify-around text-xl'>
+            <p className='my-auto'>🚩 {bombs}</p>
+            <button className='p-2' onClick={() => refreshGame()}>🔁 Restart</button>
+        </div>
         <table className='mx-auto my-auto'>
             <tbody>
             {Array.from({ length: h }, (_, row) => (
@@ -102,6 +119,7 @@ function Field({field, w, h}) {
             ))}
             </tbody>
         </table>
+        </>
     );
 }
 
