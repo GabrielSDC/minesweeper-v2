@@ -41,6 +41,16 @@ function Field({field, w, h, b, restartGame}) {
         for (let index of floodFillIndexes(cells, i)) {
             next[index] = { ...next[index], isCaved: true };
         }
+
+        const revealedCells = next
+            .map((cell) => next[cell.y * w + cell.x].isCaved)
+            .reduce((acc, curr) => acc + curr, 0);
+
+        if (field.emptyCells - revealedCells === 0) {
+            setCells(next.map((cell) => cell.isMined ? {...cell, isFlagged: true} : cell));
+            setGameState('stopped');
+            alert('ganhou');
+        }
         
         setCells(next);
     }
@@ -82,6 +92,17 @@ function Field({field, w, h, b, restartGame}) {
 
                 next[index] = { ...next[index], isCaved: true };
             }
+        }
+        
+        const revealedCells = next
+            .map((cell) => next[cell.y * w + cell.x].isCaved)
+            .reduce((acc, curr) => acc + curr, 0);
+        console.log(revealedCells);
+
+        if (field.emptyCells - revealedCells === 0) {
+            setCells(next.map((cell) => cell.isMined ? {...cell, isFlagged: true} : cell));
+            setGameState('stopped');
+            alert('ganhou');
         }
 
         setCells(next);
