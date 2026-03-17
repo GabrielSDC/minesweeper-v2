@@ -116,12 +116,12 @@ function Field({field, w, h, b, restartGame}) {
     }
 
     return (
-        <>
+        <container className='flex flex-col gap-4 p-6'>
         <div className='flex w-full justify-around text-xl'>
             <p className='my-auto'>🚩 {bombs}</p>
-            <button className='p-2' onClick={() => refreshGame()}>🔁 Restart</button>
+            <button className='p-2 cursor-pointer hover:bg-(--gray) transition rounded' onClick={() => refreshGame()}>🔁 Restart</button>
         </div>
-        <table className='mx-auto my-auto'>
+        <table className='mx-auto my-auto border-4 border-(--green-border)'>
             <tbody>
             {Array.from({ length: h }, (_, row) => (
                 <tr key={'row'+row}>
@@ -140,7 +140,7 @@ function Field({field, w, h, b, restartGame}) {
             ))}
             </tbody>
         </table>
-        </>
+        </container>
     );
 }
 
