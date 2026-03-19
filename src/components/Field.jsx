@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Cell from './Cell.jsx'
+import SelectMode from './SelectMode.jsx';
 
 function Field({field, w, h, b, restartGame}) {
     const [cells, setCells] = useState(field.cells);
@@ -116,10 +117,14 @@ function Field({field, w, h, b, restartGame}) {
     }
 
     return (
-        <container className='flex flex-col gap-4 p-6'>
+        <div className='flex flex-col gap-4 p-6'>
         <div className='flex w-full justify-around text-xl'>
             <p className='my-auto'>🚩 {bombs}</p>
-            <button className='p-2 cursor-pointer hover:bg-(--gray) transition rounded' onClick={() => refreshGame()}>🔁 Restart</button>
+            <SelectMode />
+            <button className='p-2 cursor-pointer hover:bg-(--gray) transition rounded' 
+                    onClick={() => refreshGame()}>
+                    🔁 Restart
+            </button>
         </div>
         <table className='mx-auto my-auto border-4 border-(--green-border)'>
             <tbody>
@@ -140,7 +145,7 @@ function Field({field, w, h, b, restartGame}) {
             ))}
             </tbody>
         </table>
-        </container>
+        </div>
     );
 }
 
