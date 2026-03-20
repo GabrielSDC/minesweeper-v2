@@ -7,7 +7,7 @@ export default class CellField {
         this.totalMines = b;
 
         this.emptyCells = h * w - b;
-        this.cells = Array.from({ length: w * h }, (_, i) => new Cell(i % w, Math.floor(i / w)));  
+        this.cells = Array.from({ length: w * h }, (_, i) => new Cell(i % w, Math.floor(i / w)));
         this.mines = [];
 
         // connect all cells to their neighboors

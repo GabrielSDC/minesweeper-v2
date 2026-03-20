@@ -1,12 +1,12 @@
 import { memo } from 'react';
 
-const Cell = memo(function Cell({minesAround, isCaved, isFlagged, isMined, revealCell, revealAround, flagCell, index}) {
-    if (!isCaved) {
+const Cell = memo(function Cell({cell, revealCell, revealAround, flagCell, index}) {
+    if (!cell.isCaved) {
         return <div onClick={() => revealCell(index)} 
                     onContextMenu={(e) => flagCell(index, e)} 
                     className='w-8 h-8 bg-(--green) hover:border hover:border-(--green-border) content-center'>
             <p className='text-center text-lg select-none'>
-                {isFlagged && '🚩'}
+                {cell.isFlagged && '🚩'}
             </p>
         </div>;
     }
@@ -15,7 +15,7 @@ const Cell = memo(function Cell({minesAround, isCaved, isFlagged, isMined, revea
                 onContextMenu={(e) => flagCell(index, e)} 
                 className='w-8 h-8 bg-(--brown) hover:border hover:border-(--brown-border) content-center'>
         <p className='text-center my-auto font-bold text-lg text-(--number) select-none'>
-            {isMined ? '💣' : minesAround || ''}
+            {cell.isMined ? '💣' : cell.minesAround || ''}
         </p>
     </div>;
 });

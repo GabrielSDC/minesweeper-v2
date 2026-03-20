@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import Cell from './Cell.jsx'
 import SelectMode from './SelectMode.jsx';
+import { useField, useFieldDispatch } from '../contexts/FieldContext.jsx';
 
-function Field({field, w, h, b, restartGame}) {
+function Field() {
+    const field = useField();
+    const dispatch = useFieldDispatch();
+
     const [cells, setCells] = useState(field.cells);
-    const [bombs, setBombs] = useState(b);
+    const [bombs, setBombs] = useState(field.totalMines);
     const [gameState, setGameState] = useState('playing')
 
     function floodFillIndexes(cells, i, indexes = []) {
@@ -19,7 +23,7 @@ function Field({field, w, h, b, restartGame}) {
         }
 
         for (const cell of cells[i].neighbors) {
-            const index = cell.y * w + cell.x;
+            const index = cell.y * field.width + cell.x;
             floodFillIndexes(cells, index, indexes);
         }
 
@@ -44,7 +48,7 @@ function Field({field, w, h, b, restartGame}) {
         }
 
         const revealedCells = next
-            .map((cell) => next[cell.y * w + cell.x].isCaved)
+            .map((cell) => next[cell.y * field.width + cell.x].isCaved)
             .reduce((acc, curr) => acc + curr, 0);
 
         if (field.emptyCells - revealedCells === 0) {
@@ -72,7 +76,7 @@ function Field({field, w, h, b, restartGame}) {
     
     function revealAround(i) {
         const flagsAround = cells[i].neighbors
-            .map((cell) => cells[cell.y * w + cell.x].isFlagged)
+            .map((cell) => cells[cell.y * field.width + cell.x].isFlagged)
             .reduce((acc, curr) => acc + curr, 0);
 
         if (gameState === 'stopped' || cells[i].minesAround === 0 || cells[i].minesAround !== flagsAround) {
@@ -82,7 +86,7 @@ function Field({field, w, h, b, restartGame}) {
         const next = [...cells];
 
         for (const cell of cells[i].neighbors) {
-            const j = cell.y * w + cell.x;
+            const j = cell.y * field.width + cell.x;
             
             for (let index of floodFillIndexes(cells, j)) {
                 if (next[index].isMined) {
@@ -96,7 +100,7 @@ function Field({field, w, h, b, restartGame}) {
         }
         
         const revealedCells = next
-            .map((cell) => next[cell.y * w + cell.x].isCaved)
+            .map((cell) => next[cell.y * field.width + cell.x].isCaved)
             .reduce((acc, curr) => acc + curr, 0);
         console.log(revealedCells);
 
@@ -110,10 +114,13 @@ function Field({field, w, h, b, restartGame}) {
     }
 
     function refreshGame() {
-        restartGame();
-        setCells(field.cells);
-        setBombs(b);
+        dispatch({
+            type: 'restartField'
+        });
+
         setGameState('playing')
+        setBombs(field.totalMines);
+        setCells(field.cells);
     }
 
     return (
@@ -128,13 +135,13 @@ function Field({field, w, h, b, restartGame}) {
         </div>
         <table className='mx-auto my-auto border-4 border-(--green-border)'>
             <tbody>
-            {Array.from({ length: h }, (_, row) => (
+            {Array.from({ length: field.height }, (_, row) => (
                 <tr key={'row'+row}>
-                {Array.from({ length: w }, (_, col) => (
+                {Array.from({ length: field.width }, (_, col) => (
                     <td key={'cols'+col}>
-                        <Cell key={row * w + col}
-                            index={row * w + col} 
-                            {...cells[row * w + col]} 
+                        <Cell key={row * field.width + col}
+                            index={row * field.width + col} 
+                            cell={cells[row * field.width + col]} 
                             revealCell={revealCell} 
                             revealAround={revealAround}  
                             flagCell={flagCell}/>
