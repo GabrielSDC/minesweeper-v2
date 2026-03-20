@@ -3,9 +3,7 @@ import { FieldProvider } from './contexts/FieldContext.jsx';
 
 function App() {
 	return (
-		<FieldProvider>
-			<Field />
-		</FieldProvider>
+		<FieldProvider />
 	)
 }
 

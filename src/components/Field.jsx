@@ -9,7 +9,7 @@ function Field() {
 
     const [cells, setCells] = useState(field.cells);
     const [bombs, setBombs] = useState(field.totalMines);
-    const [gameState, setGameState] = useState('playing')
+    const [gameState, setGameState] = useState('playing');
 
     function floodFillIndexes(cells, i, indexes = []) {
         if (indexes.includes(i) || cells[i].isFlagged || cells[i].isCaved) {
@@ -102,7 +102,6 @@ function Field() {
         const revealedCells = next
             .map((cell) => next[cell.y * field.width + cell.x].isCaved)
             .reduce((acc, curr) => acc + curr, 0);
-        console.log(revealedCells);
 
         if (field.emptyCells - revealedCells === 0) {
             setCells(next.map((cell) => cell.isMined ? {...cell, isFlagged: true} : cell));
@@ -127,7 +126,7 @@ function Field() {
         <div className='flex flex-col gap-4 p-6'>
         <div className='flex w-full justify-around text-xl'>
             <p className='my-auto'>🚩 {bombs}</p>
-            <SelectMode />
+            <SelectMode refreshGame={refreshGame}/>
             <button className='p-2 cursor-pointer hover:bg-(--gray) transition rounded' 
                     onClick={() => refreshGame()}>
                     🔁 Restart

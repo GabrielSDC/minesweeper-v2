@@ -1,17 +1,18 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer, useState } from "react";
 import CellField from "../utils/CellField";
+import Field from "../components/Field";
 
 export const FieldContext = createContext(null);
 export const FieldDispatchContext = createContext(null);
 
-export function FieldProvider({ children }) {
-    const dimensions = {w: 30, h: 15, b: 90};
+export function FieldProvider() {
+    const [dimensions, setDimensions] = useState({w: 10, h: 10, b: 10});
 	const [field, dispatch] = useReducer(fieldReducer, new CellField(dimensions));
-    // console.log(children, field);
+
     return (
         <FieldContext value={field}>
             <FieldDispatchContext value={dispatch}>
-                { children }
+                <Field key={`${field.width}-${field.height}`} />
             </FieldDispatchContext>
         </FieldContext>
     );
@@ -28,13 +29,11 @@ export function useFieldDispatch() {
 function fieldReducer(field, action) {
     switch (action.type) {
         case 'restartField':
-            const same = {
+            return new CellField({
                 w: field.width,
                 h: field.height,
                 b: field.totalMines,
-            };
-            console.log(same);
-            return new CellField(same);
+            });
         case 'changeDifficulty':
             return new CellField(action.dimensions);
     }

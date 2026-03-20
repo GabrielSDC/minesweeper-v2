@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useFieldDispatch } from "../contexts/FieldContext";
 
-function SelectMode({ changeDificulty }) {
+function SelectMode({ refreshGame }) {
     const modes = [
         {
             name: 'Easy',
@@ -22,9 +22,15 @@ function SelectMode({ changeDificulty }) {
     return (
         <div className="flex">
             <select className='text-base px-4' 
-                    onChange={(e) => dispatch({ type: 'changeDifficulty', dimensions: JSON.parse(e.target.value) })}>
+                    onChange={(e) => {
+                        dispatch({
+                            type: 'changeDifficulty',
+                            dimensions: JSON.parse(e.target.value) 
+                        });
+                        refreshGame();
+                    }}>
                 {Array.from({ length: modes.length }, (_, i) => 
-                    <option key={i} value={JSON.stringify(modes[i].values)} defaultValue={modes[i].default}>
+                    <option key={i} value={JSON.stringify(modes[i].values)}>
                         {modes[i].name}
                     </option>)}
             </select>
