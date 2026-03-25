@@ -106,7 +106,7 @@ function Field() {
         if (field.emptyCells - revealedCells === 0) {
             setCells(next.map((cell) => cell.isMined ? {...cell, isFlagged: true} : cell));
             setGameState('stopped');
-            alert('ganhou');
+            alert('You won!');
         }
 
         setCells(next);
